@@ -13,6 +13,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
+    Route::get('transactions', function () {
+        return Inertia::render('transactions/Index');
+    })->name('transactions.index');
+
+    Route::get('transactions/create', function () {
+        return Inertia::render('transactions/Create');
+    })->name('transactions.create');
+
     Route::resource('products', ProductController::class);
 });
 
