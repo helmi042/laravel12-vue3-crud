@@ -30,11 +30,11 @@ composer run dev
 
 Open `http://localhost:8000`.
 
-## Run (separate terminals)
+<!-- ## Run (separate terminals)
 ```powershell
 php artisan serve
 npm run dev
 ```
 
 ## Optional: Use MySQL/Postgres
-Update `.env` (`DB_CONNECTION`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) before `php artisan migrate`.
+Update `.env` (`DB_CONNECTION`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) before `php artisan migrate`. -->
