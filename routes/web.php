@@ -1,6 +1,9 @@
 <?php
 
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionCategoryController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -9,19 +12,11 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('transactions', function () {
-        return Inertia::render('transactions/Index');
-    })->name('transactions.index');
-
-    Route::get('transactions/create', function () {
-        return Inertia::render('transactions/Create');
-    })->name('transactions.create');
-
-    Route::resource('products', ProductController::class);
+    Route::resource('transactions', TransactionController::class)->only(['index', 'store']);
+    Route::resource('transaction-categories', TransactionCategoryController::class);
+    Route::resource('wallets', WalletController::class);
 });
 
 require __DIR__.'/settings.php';

@@ -50,4 +50,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Product::class);
     }
+
+    public function wallets()
+    {
+        return $this->hasMany(Wallet::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function transactionCategories()
+    {
+        return $this->hasMany(TransactionCategory::class);
+    }
 }
