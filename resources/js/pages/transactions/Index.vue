@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -194,6 +194,14 @@ const filteredTransactions = computed(() => {
 
         return true;
     });
+});
+
+const emptyTransactionsMessage = computed(() => {
+    if (!transactions.value.length) {
+        return 'Belum ada transaksi yang tercatat.';
+    }
+
+    return 'Tidak ada transaksi yang cocok dengan filter ini.';
 });
 
 const resetFilters = () => {
@@ -444,27 +452,32 @@ const handleSubmit = () => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow v-for="transaction in filteredTransactions" :key="transaction.id">
-                                    <TableCell class="whitespace-nowrap">{{ formatDate(transaction.date) }}</TableCell>
-                                    <TableCell>
-                                        <p class="font-medium text-foreground">{{ transaction.category }}</p>
-                                    </TableCell>
-                                    <TableCell>{{ getWalletLabel(transaction) }}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                                            :class="typeMeta[transaction.type].class"
-                                        >
-                                            {{ typeMeta[transaction.type].label }}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell class="text-right font-semibold" :class="amountTone(transaction)">
-                                        {{ amountPrefix(transaction) }}{{ formatCurrency(transaction.amount) }}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button variant="secondary" size="sm">Detail</Button>
-                                    </TableCell>
-                                </TableRow>
+                                <template v-if="filteredTransactions.length">
+                                    <TableRow v-for="transaction in filteredTransactions" :key="transaction.id">
+                                        <TableCell class="whitespace-nowrap">{{ formatDate(transaction.date) }}</TableCell>
+                                        <TableCell>
+                                            <p class="font-medium text-foreground">{{ transaction.category }}</p>
+                                        </TableCell>
+                                        <TableCell>{{ getWalletLabel(transaction) }}</TableCell>
+                                        <TableCell>
+                                            <span
+                                                class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
+                                                :class="typeMeta[transaction.type].class"
+                                            >
+                                                {{ typeMeta[transaction.type].label }}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell class="text-right font-semibold" :class="amountTone(transaction)">
+                                            {{ amountPrefix(transaction) }}{{ formatCurrency(transaction.amount) }}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button variant="secondary" size="sm">Detail</Button>
+                                        </TableCell>
+                                    </TableRow>
+                                </template>
+                                <TableEmpty v-else :colspan="6">
+                                    {{ emptyTransactionsMessage }}
+                                </TableEmpty>
                             </TableBody>
                         </Table>
                     </CardContent>

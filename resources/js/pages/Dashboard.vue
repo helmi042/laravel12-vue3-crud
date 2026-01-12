@@ -2,7 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { buttonVariants } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -133,7 +133,7 @@ const walletBalances = computed(() =>
         name: wallet.name,
         account: walletTypeLabel[wallet.type as keyof typeof walletTypeLabel] ?? wallet.type,
         balance: formatCurrency(wallet.balance ?? 0),
-        activity: wallet.updatedAt ? `Update ${formatDate(wallet.updatedAt)}` : 'Belum ada update',
+        activity: wallet.updatedAt ? `Aktivitas ${formatDate(wallet.updatedAt)}` : 'Belum ada transaksi',
     })),
 );
 
@@ -248,13 +248,18 @@ const typeLabel = {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow v-for="item in recentTransactions" :key="item.id">
-                                    <TableCell class="whitespace-nowrap">{{ formatDate(item.date) }}</TableCell>
-                                    <TableCell>{{ item.category }}</TableCell>
-                                    <TableCell>{{ getTransactionWallet(item) }}</TableCell>
-                                    <TableCell>{{ typeLabel[item.type] ?? item.type }}</TableCell>
-                                    <TableCell class="text-right font-medium">{{ formatCurrency(item.amount) }}</TableCell>
-                                </TableRow>
+                                <template v-if="recentTransactions.length">
+                                    <TableRow v-for="item in recentTransactions" :key="item.id">
+                                        <TableCell class="whitespace-nowrap">{{ formatDate(item.date) }}</TableCell>
+                                        <TableCell>{{ item.category }}</TableCell>
+                                        <TableCell>{{ getTransactionWallet(item) }}</TableCell>
+                                        <TableCell>{{ typeLabel[item.type] ?? item.type }}</TableCell>
+                                        <TableCell class="text-right font-medium">{{ formatCurrency(item.amount) }}</TableCell>
+                                    </TableRow>
+                                </template>
+                                <TableEmpty v-else :colspan="5">
+                                    Belum ada transaksi terbaru.
+                                </TableEmpty>
                             </TableBody>
                         </Table>
                     </CardContent>

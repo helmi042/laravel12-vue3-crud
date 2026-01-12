@@ -28,6 +28,24 @@ const formatCurrency = (value) => {
     }).format(Number.isNaN(amount) ? 0 : amount);
 };
 
+const formatDate = (value) => {
+    if (!value) {
+        return '-';
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return '-';
+    }
+
+    return date.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+    });
+};
+
 const breadcrumbs = [
     {
         title: 'Dashboard',
@@ -76,8 +94,16 @@ const breadcrumbs = [
                             <div>{{ typeLabels[props.wallet.type] ?? props.wallet.type }}</div>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <div class="w-32 font-semibold">Saldo</div>
+                            <div class="w-32 font-semibold">Saldo saat ini</div>
+                            <div>{{ formatCurrency(props.wallet.current_balance) }}</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-32 font-semibold">Saldo awal</div>
                             <div>{{ formatCurrency(props.wallet.balance) }}</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-32 font-semibold">Aktivitas terakhir</div>
+                            <div>{{ formatDate(props.wallet.last_activity) }}</div>
                         </div>
                         <div class="flex space-x-4">
                             <div class="w-32 font-semibold">Catatan</div>

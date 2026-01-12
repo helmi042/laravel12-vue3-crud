@@ -114,6 +114,9 @@ const breadcrumbs = [
                                         min="0"
                                         placeholder="Contoh: 2500000"
                                     />
+                                    <p class="text-xs text-muted-foreground">
+                                        Saldo akan otomatis menyesuaikan setiap ada transaksi.
+                                    </p>
                                     <InputError :message="form.errors.balance" />
                                 </div>
                             </div>

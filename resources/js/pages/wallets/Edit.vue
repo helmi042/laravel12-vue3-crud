@@ -115,6 +115,9 @@ const breadcrumbs = [
                                 <div class="grid w-full gap-2">
                                     <Label for="balance">Saldo awal</Label>
                                     <Input id="balance" v-model="form.balance" type="number" inputmode="numeric" min="0" />
+                                    <p class="text-xs text-muted-foreground">
+                                        Saldo akan otomatis menyesuaikan setiap ada transaksi.
+                                    </p>
                                     <InputError :message="form.errors.balance" />
                                 </div>
                             </div>
