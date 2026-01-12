@@ -81,7 +81,25 @@ const formatDate = (value) => {
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="wallet in wallets" :key="wallet.id">
-                        <TableCell class="font-medium">{{ wallet.name }}</TableCell>
+                        <TableCell>
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 overflow-hidden rounded-full border border-border bg-muted/40">
+                                    <img
+                                        v-if="wallet.logo_url"
+                                        :src="wallet.logo_url"
+                                        :alt="`Logo ${wallet.name}`"
+                                        class="h-full w-full object-cover"
+                                    />
+                                    <div
+                                        v-else
+                                        class="flex h-full w-full items-center justify-center text-xs font-semibold text-muted-foreground"
+                                    >
+                                        {{ wallet.name?.charAt(0)?.toUpperCase() ?? '?' }}
+                                    </div>
+                                </div>
+                                <span class="font-medium">{{ wallet.name }}</span>
+                            </div>
+                        </TableCell>
                         <TableCell>{{ typeLabels[wallet.type] ?? wallet.type }}</TableCell>
                         <TableCell>{{ formatCurrency(wallet.balance) }}</TableCell>
                         <TableCell>{{ formatDate(wallet.updated_at) }}</TableCell>

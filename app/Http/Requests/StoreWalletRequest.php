@@ -26,6 +26,7 @@ class StoreWalletRequest extends FormRequest
             'type' => ['required', 'string', 'in:cash,bank,ewallet'],
             'balance' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
