@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use App\Services\WalletBalanceService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,7 +12,7 @@ class DashboardController extends Controller
     /**
      * Display the application dashboard.
      */
-    public function index(Request $request)
+    public function index(Request $request, WalletBalanceService $walletBalanceService)
     {
         $startOfMonth = now()->startOfMonth()->toDateString();
         $endOfMonth = now()->endOfMonth()->toDateString();
@@ -28,16 +29,14 @@ class DashboardController extends Controller
         $expenseCount = (clone $baseMonthlyQuery)->where('type', 'expense')->count();
         $transferCount = (clone $baseMonthlyQuery)->where('type', 'transfer')->count();
 
-        $wallets = $request->user()
-            ->wallets()
-            ->orderBy('name')
-            ->get()
-            ->map(fn ($wallet) => [
-                'id' => $wallet->id,
-                'name' => $wallet->name,
-                'type' => $wallet->type,
-                'balance' => $wallet->balance,
-                'updatedAt' => $wallet->updated_at?->toDateString(),
+        $wallets = $walletBalanceService
+            ->summarize($request->user(), $request->user()->wallets()->orderBy('name')->get())
+            ->map(fn (array $wallet) => [
+                'id' => $wallet['id'],
+                'name' => $wallet['name'],
+                'type' => $wallet['type'],
+                'balance' => $wallet['current_balance'],
+                'updatedAt' => $wallet['last_activity'],
             ]);
 
         $recentTransactions = $request->user()
