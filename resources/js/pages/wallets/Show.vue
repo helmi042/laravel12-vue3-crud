@@ -60,6 +60,18 @@ const breadcrumbs = [
                             <div>{{ props.wallet.name }}</div>
                         </div>
                         <div class="flex items-center space-x-4">
+                            <div class="w-32 font-semibold">Logo</div>
+                            <div>
+                                <div
+                                    v-if="props.wallet.logo_url"
+                                    class="h-20 w-20 overflow-hidden rounded-lg border border-border bg-muted/40"
+                                >
+                                    <img :src="props.wallet.logo_url" alt="Logo dompet" class="h-full w-full object-cover" />
+                                </div>
+                                <div v-else class="text-sm text-muted-foreground">Belum ada logo.</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
                             <div class="w-32 font-semibold">Jenis</div>
                             <div>{{ typeLabels[props.wallet.type] ?? props.wallet.type }}</div>
                         </div>

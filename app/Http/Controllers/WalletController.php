@@ -6,6 +6,7 @@ use App\Http\Requests\StoreWalletRequest;
 use App\Http\Requests\UpdateWalletRequest;
 use App\Models\Wallet;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class WalletController extends Controller
 {
@@ -37,7 +38,15 @@ class WalletController extends Controller
      */
     public function store(StoreWalletRequest $request)
     {
-        $request->user()->wallets()->create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('logo')) {
+            $data['logo_path'] = $request->file('logo')->store('wallet-logos', 'public');
+        }
+
+        unset($data['logo']);
+
+        $request->user()->wallets()->create($data);
 
         return redirect()->route('wallets.index');
     }
@@ -67,7 +76,19 @@ class WalletController extends Controller
      */
     public function update(UpdateWalletRequest $request, Wallet $wallet)
     {
-        $wallet->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('logo')) {
+            if ($wallet->logo_path) {
+                Storage::disk('public')->delete($wallet->logo_path);
+            }
+
+            $data['logo_path'] = $request->file('logo')->store('wallet-logos', 'public');
+        }
+
+        unset($data['logo']);
+
+        $wallet->update($data);
 
         return redirect()->route('wallets.index');
     }
@@ -77,6 +98,10 @@ class WalletController extends Controller
      */
     public function destroy(Wallet $wallet)
     {
+        if ($wallet->logo_path) {
+            Storage::disk('public')->delete($wallet->logo_path);
+        }
+
         $wallet->delete();
 
         return redirect()->route('wallets.index');
