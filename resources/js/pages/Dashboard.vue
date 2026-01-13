@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableR
 import { buttonVariants } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,6 +51,7 @@ const props = defineProps<{
     transactionSummary: TransactionSummary;
     wallets: WalletBalance[];
     recentTransactions: RecentTransaction[];
+    chartData: { date: string; income: number; expense: number; net: number  }[];
 }>();
 
 const formatCurrency = (value: number) => {
@@ -152,6 +154,44 @@ const typeLabel = {
     expense: 'Pengeluaran',
     transfer: 'Transfer antar dompet',
 };
+const chartSeries = computed(() => [
+  { name: 'Pendapatan', data: props.chartData?.map((d) => d.income) ?? [] },
+  { name: 'Pengeluaran', data: props.chartData?.map((d) => d.expense) ?? [] },
+  { name: 'Saldo Bersih', data: props.chartData?.map((d) => d.net) ?? [] },
+]);
+const chartCategories = computed(() => props.chartData?.map((d) => d.date) ?? []);
+const chartOptions = computed(() => ({
+
+    colors: ['#10b981',
+     '#f43f5e',
+      '#3B82F6'],
+    series: chartSeries.value,
+    chart: {
+        height: 350,
+        type: 'area',
+        toolbar: {
+            show: false,
+        },
+    },
+    grid: {
+        show: false,
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        curve: 'smooth'
+    },
+    xaxis: {
+        type: 'datetime',
+        categories: chartCategories.value,
+    },
+    tooltip: {
+        x: {
+            format: 'dd/MM/yy'
+        },
+    },
+}));
 </script>
 
 <template>
@@ -164,6 +204,8 @@ const typeLabel = {
                     <h2 class="text-lg font-semibold text-foreground">Ringkasan</h2>
                     <p class="text-sm text-muted-foreground">Ikhtisar kondisi keuangan bulan ini.</p>
                 </div>
+                <VueApexCharts type="area" height="350" :options="chartOptions" :series="chartOptions.series"></VueApexCharts>
+
                 <div class="grid gap-4 md:grid-cols-3">
                     <Card v-for="card in summaryCards" :key="card.title">
                         <CardHeader class="pb-2">
