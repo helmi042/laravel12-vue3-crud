@@ -7,6 +7,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
+import Tooltip from '@/components/ui/tooltip/Tooltip.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -187,10 +188,18 @@ const chartOptions = computed(() => ({
         type: 'datetime',
         categories: chartCategories.value,
     },
+    yaxis: {
+        labels: {
+            formatter: (val: number) => formatCurrency(val),
+        },
+    },
     tooltip: {
         x: {
             format: 'dd/MM/yy'
         },
+          y: {
+        formatter: (val: number) => formatCurrency(val),
+      },
     },
 }));
 
@@ -198,6 +207,11 @@ const chartDonutSeries = computed(() => props.topExpenses?.map((d) => d.total) ?
 const chartDonut = computed(() => props.topExpenses?.map((d) => d.category) ?? []);
 const chartDonutOptions = computed(() => ({
     labels: chartDonut.value,
+    tooltip:{
+        y: {
+            formatter: (val: number) => formatCurrency(val),
+        },
+    },
     responsive: [{
         breakpoint: 480,
         options: {
