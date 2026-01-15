@@ -52,6 +52,7 @@ const props = defineProps<{
     wallets: WalletBalance[];
     recentTransactions: RecentTransaction[];
     chartData: { date: string; income: number; expense: number; net: number  }[];
+    topExpenses: { category: string; total: number }[];
 }>();
 
 const formatCurrency = (value: number) => {
@@ -193,7 +194,8 @@ const chartOptions = computed(() => ({
     },
 }));
 
-const chartDonut = computed(() => props.chartData?.map((d) => d.date) ?? []);
+const chartDonutSeries = computed(() => props.topExpenses?.map((d) => d.total) ?? []);
+const chartDonut = computed(() => props.topExpenses?.map((d) => d.category) ?? []);
 const chartDonutOptions = computed(() => ({
     labels: chartDonut.value,
     responsive: [{
@@ -226,7 +228,7 @@ const chartDonutOptions = computed(() => ({
              <section class="grid gap-4 md:grid-cols-2">
                 <Card>
                     <CardHeader class="pb-0">
-                    <CardTitle>Tren Pendapatan & Pengeluaran</CardTitle>
+                    <CardTitle>Pendapatan & Pengeluaran</CardTitle>
                     <CardDescription>Pergerakan harian</CardDescription>
                     </CardHeader>
                     <CardContent class="pt-2">
@@ -249,7 +251,7 @@ const chartDonutOptions = computed(() => ({
                         type="donut"
                         height="320"
                         :options="chartDonutOptions"
-                        :series="[44, 55, 13, 43, 22]"
+                        :series="chartDonutSeries"
                     />
                     </CardContent>
                 </Card>

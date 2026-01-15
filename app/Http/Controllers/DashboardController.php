@@ -20,22 +20,22 @@ class DashboardController extends Controller
 
         $baseMonthlyQuery = $request->user()
             ->transactions()
-            ->whereBetween('date', [$startOfMonth, $endOfMonth]);
+            ->whereBetween('transactions.date', [$startOfMonth, $endOfMonth]);
 
-        $incomeTotal = (clone $baseMonthlyQuery)->where('type', 'income')->sum('amount');
-        $expenseTotal = (clone $baseMonthlyQuery)->where('type', 'expense')->sum('amount');
-        $transferTotal = (clone $baseMonthlyQuery)->where('type', 'transfer')->sum('amount');
+        $incomeTotal = (clone $baseMonthlyQuery)->where('transactions.type', 'income')->sum('transactions.amount');
+        $expenseTotal = (clone $baseMonthlyQuery)->where('transactions.type', 'expense')->sum('transactions.amount');
+        $transferTotal = (clone $baseMonthlyQuery)->where('transactions.type', 'transfer')->sum('transactions.amount');
 
-        $incomeCount = (clone $baseMonthlyQuery)->where('type', 'income')->count();
-        $expenseCount = (clone $baseMonthlyQuery)->where('type', 'expense')->count();
-        $transferCount = (clone $baseMonthlyQuery)->where('type', 'transfer')->count();
+        $incomeCount = (clone $baseMonthlyQuery)->where('transactions.type', 'income')->count();
+        $expenseCount = (clone $baseMonthlyQuery)->where('transactions.type', 'expense')->count();
+        $transferCount = (clone $baseMonthlyQuery)->where('transactions.type', 'transfer')->count();
 
         $dailySummary = (clone $baseMonthlyQuery)
-            ->selectRaw('date,
-                IFNULL(SUM(CASE WHEN type = "income" THEN amount ELSE 0 END), 0) as income_total,
-                IFNULL(SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END), 0) as expense_total')
-            ->groupBy('date')
-            ->orderBy('date')
+            ->selectRaw('transactions.date as date,
+                IFNULL(SUM(CASE WHEN transactions.type = "income" THEN transactions.amount ELSE 0 END), 0) as income_total,
+                IFNULL(SUM(CASE WHEN transactions.type = "expense" THEN transactions.amount ELSE 0 END), 0) as expense_total')
+            ->groupBy('transactions.date')
+            ->orderBy('transactions.date')
             ->get()
             ->map(fn ($row) => [
                 'date' => Carbon::parse($row->date)->toDateString(),
@@ -44,7 +44,18 @@ class DashboardController extends Controller
                 'net' => (float) $row->income_total - (float) $row->expense_total,
             ]);
 
-
+        $topexpenseSummary = (clone $baseMonthlyQuery)
+            ->where('transactions.type', 'expense')
+            ->leftJoin('transaction_categories', 'transactions.category_id', '=', 'transaction_categories.id')
+            ->selectRaw('COALESCE(transaction_categories.name, transactions.category) as category_name, SUM(transactions.amount) as total_amount')
+            ->groupBy('category_name')
+            ->orderByDesc('total_amount')
+            ->limit(5)
+            ->get()
+            ->map(fn ($row) => [
+                'category' => $row->category_name ?? 'Tidak ada kategori',
+                'total' => (float) $row->total_amount,
+            ]);
 
         $wallets = $walletBalanceService
             ->summarize($request->user(), $request->user()->wallets()->orderBy('name')->get())
@@ -97,6 +108,7 @@ class DashboardController extends Controller
             'wallets' => $wallets,
             'recentTransactions' => $recentTransactions,
             'chartData' => $dailySummary,
+            'topExpenses' => $topexpenseSummary,
         ]);
     }
 }
