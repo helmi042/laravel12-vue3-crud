@@ -167,7 +167,7 @@ const chartOptions = computed(() => ({
       '#3B82F6'],
     series: chartSeries.value,
     chart: {
-        height: 350,
+        height: 200,
         type: 'area',
         toolbar: {
             show: false,
@@ -192,6 +192,25 @@ const chartOptions = computed(() => ({
         },
     },
 }));
+
+const chartDonut = computed(() => props.chartData?.map((d) => d.date) ?? []);
+const chartDonutOptions = computed(() => ({
+    labels: chartDonut.value,
+    responsive: [{
+        breakpoint: 480,
+        options: {
+            chart: {
+                width: 200
+            },
+            toolbar:{
+                show: false,
+            },
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }]
+}));
 </script>
 
 <template>
@@ -204,7 +223,37 @@ const chartOptions = computed(() => ({
                     <h2 class="text-lg font-semibold text-foreground">Ringkasan</h2>
                     <p class="text-sm text-muted-foreground">Ikhtisar kondisi keuangan bulan ini.</p>
                 </div>
-                <VueApexCharts type="area" height="350" :options="chartOptions" :series="chartOptions.series"></VueApexCharts>
+             <section class="grid gap-4 md:grid-cols-2">
+                <Card>
+                    <CardHeader class="pb-0">
+                    <CardTitle>Tren Pendapatan & Pengeluaran</CardTitle>
+                    <CardDescription>Pergerakan harian</CardDescription>
+                    </CardHeader>
+                    <CardContent class="pt-2">
+                    <VueApexCharts
+                        type="area"
+                        height="320"
+                        :options="chartOptions"
+                        :series="chartOptions.series"
+                    />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader class="pb-0">
+                    <CardTitle>Pengeluaran</CardTitle>
+                    <CardDescription>Proporsi kategori Pengeluaran</CardDescription>
+                    </CardHeader>
+                    <CardContent class="pt-2">
+                    <VueApexCharts
+                        type="donut"
+                        height="320"
+                        :options="chartDonutOptions"
+                        :series="[44, 55, 13, 43, 22]"
+                    />
+                    </CardContent>
+                </Card>
+            </section>
 
                 <div class="grid gap-4 md:grid-cols-3">
                     <Card v-for="card in summaryCards" :key="card.title">
