@@ -11,6 +11,27 @@ import InputError from '@/components/InputError.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, reactive, watch } from 'vue';
 
+import { ref } from 'vue';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+
+const showDetail = ref(false);
+const selectedTx = ref<RecentTransaction | null>(null);
+
+    const openDetail = (tx: RecentTransaction) => {
+        selectedTx.value = tx;
+        showDetail.value = true;
+    };
+    const closeDetail = () => {
+        selectedTx.value = null;
+        showDetail.value = false;
+    };
 const breadcrumbs = [
     {
         title: 'Dashboard',
@@ -34,6 +55,7 @@ type Transaction = {
     walletName?: string | null;
     walletFromName?: string | null;
     walletToName?: string | null;
+    notes?: string | null;
 };
 
 type WalletOption = {
@@ -471,7 +493,7 @@ const handleSubmit = () => {
                                             {{ amountPrefix(transaction) }}{{ formatCurrency(transaction.amount) }}
                                         </TableCell>
                                         <TableCell>
-                                            <Button variant="secondary" size="sm">Detail</Button>
+                                            <Button variant="ghost" size="sm" @click="openDetail(transaction)">Detail</Button>
                                         </TableCell>
                                     </TableRow>
                                 </template>
@@ -484,5 +506,37 @@ const handleSubmit = () => {
                 </Card>
             </section>
         </div>
+    <Dialog v-model:open="showDetail">
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Detail Transaksi</DialogTitle>
+                <DialogDescription v-if="selectedTx">
+                    {{ formatDate(selectedTx.date) }} · {{ typeMeta[selectedTx.type]?.label ?? selectedTx.type }}
+                </DialogDescription>
+            </DialogHeader>
+
+            <div v-if="selectedTx" class="space-y-2">
+                <div class="flex justify-between">
+                    <span>Kategori</span><span>{{ selectedTx.category }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Dompet</span><span>{{ getWalletLabel(selectedTx) }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Nominal</span><span>{{ formatCurrency(selectedTx.amount) }}</span>
+                </div>
+                <div class="flex justify-between items-start">
+                    <span>Keterangan</span>
+                    <span class="text-right whitespace-pre-line">{{ selectedTx.notes || '-' }}</span>
+                </div>
+
+            </div>
+
+            <DialogFooter>
+                <Button variant="secondary" @click="closeDetail">Tutup</Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
     </AppLayout>
 </template>

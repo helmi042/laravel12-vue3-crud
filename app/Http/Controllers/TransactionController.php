@@ -26,6 +26,7 @@ class TransactionController extends Controller
                 'type' => $transaction->type,
                 'category' => $transaction->transactionCategory?->name ?? $transaction->category,
                 'amount' => $transaction->amount,
+                'notes' => $transaction->notes,
                 'walletId' => $transaction->wallet_id,
                 'walletFromId' => $transaction->wallet_from_id,
                 'walletToId' => $transaction->wallet_to_id,
